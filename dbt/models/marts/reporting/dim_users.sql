@@ -9,4 +9,4 @@
 SELECT
     id
     , username
-FROM {{ ref('core_users') }}
+FROM {{ ref('int_users') }}

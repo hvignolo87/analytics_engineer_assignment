@@ -1,7 +1,7 @@
 version: 2
 
 models:
-  - name: core_users
+  - name: int_users
     description: ""
     columns:
       - name: id
@@ -11,7 +11,7 @@ models:
         data_type: character varying
         description: ""
 
-  - name: core_commits
+  - name: int_commits
     description: ""
     columns:
       - name: sha
@@ -24,7 +24,7 @@ models:
         data_type: bigint
         description: ""
 
-  - name: core_events
+  - name: int_events
     description: ""
     columns:
       - name: id
@@ -40,7 +40,7 @@ models:
         data_type: integer
         description: ""
 
-  - name: core_repos
+  - name: int_repos
     description: ""
     columns:
       - name: id

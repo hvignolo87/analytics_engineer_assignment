@@ -9,4 +9,4 @@
 SELECT
     id
     , name
-FROM {{ ref('core_repos') }}
+FROM {{ ref('int_repos') }}

@@ -2,4 +2,4 @@ SELECT
     sha
     , message
     , event_id
-FROM {{ ref('core_commits') }}
+FROM {{ ref('int_commits') }}

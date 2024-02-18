@@ -24,10 +24,10 @@ quoting:
 
 models:
   clara:
-    core:
+    intermediate:
       +materialized: table
-      +schema: core
-      +tags: core
+      +schema: intermediate
+      +tags: intermediate
     marts:
       +materialized: table
       +tags: marts
