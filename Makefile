@@ -247,7 +247,7 @@ dbt-gen-source-yaml: ## Generate lightweight YAML for sources. Usage: make dbt-g
 		}'
 
 .PHONY: dbt-gen-model-yaml
-dbt-gen-model-yaml: ## Generate YAML for models. Usage: make dbt-gen-model-yaml model='["stg_events", "core_events"]'
+dbt-gen-model-yaml: ## Generate YAML for models. Usage: make dbt-gen-model-yaml model='["stg_events", "int_events"]'
 	$(call log, Generating models for $(model)...)
 	poetry run dbt run-operation generate_model_yaml --target prod --project-dir dbt --profiles-dir dbt --args \
 		'{ \
