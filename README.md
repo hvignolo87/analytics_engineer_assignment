@@ -314,7 +314,7 @@ I decided to use [classic modular data modeling techniques](https://www.getdbt.c
 - `intermediate`: here I'll place reusable models, with some deduplication logic
 - `marts`: here I'll place the final models, in a star schema (facts surrounded by dimensions)
 
-Since the raw data doesn't need much processing (just some deduplication logic), all of the models in the staging and intermediate layers will be quite similar, and the only difference will be the deduplication logic. I've created a macro to apply the DRY principle in these layers.
+Since the raw data doesn't need much processing (just some deduplication logic), all of the models in the `staging` and `intermediate` layers will be quite similar, and the only difference will be the deduplication logic. I've created a macro to apply [the DRY principle](https://docs.getdbt.com/terms/dry) in these layers.
 
 The final lineage graph is as follows:
 
