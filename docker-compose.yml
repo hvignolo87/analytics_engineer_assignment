@@ -1,0 +1,137 @@
+version: "3.9"
+name: analytics-engineer-assignment
+
+x-airflow-common:
+  &airflow-common
+  image: airflow-clara-local:latest
+  build:
+    dockerfile: ./Dockerfile.airflow
+    context: .
+  env_file:
+    - ./.env.airflow.local
+    - ./.env.dbt.local
+  volumes:
+    - ./dags:/opt/airflow/dags
+    - ./dbt:/opt/airflow/dbt:rw
+
+x-airflow-depends-on:
+  &airflow-depends-on
+  depends_on:
+    airflow-db-metadata:
+      condition: service_healthy
+    airflow-init:
+      condition: service_completed_successfully
+
+services:
+  postgres:
+    container_name: postgres
+    hostname: postgres
+    image: postgres:${POSTGRES_VERSION:-14.7}
+    env_file:
+      - ./.env.postgres.local
+    ports:
+      - ${POSTGRES_EXT_PORT:-5440}:${POSTGRES_PORT:-5432}
+    restart: unless-stopped
+    volumes:
+      - ./scripts/postgres_init.sh:/docker-entrypoint-initdb.d/postgres_init.sh
+    healthcheck:
+      test:
+        [
+          "CMD",
+          "pg_isready",
+          "-U",
+          "${POSTGRES_USER}",
+          "-d",
+          "${POSTGRES_DB}"
+        ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  bootstrap-dbt:
+    image: bootstrap-dbt:latest
+    build:
+      dockerfile: ./Dockerfile.dbt
+      context: .
+    container_name: bootstrap-dbt
+    depends_on:
+      postgres:
+        condition: service_healthy
+    working_dir: /code
+    entrypoint:
+      - /bin/bash
+      - -c
+      - poetry run dbt seed --target prod --project-dir dbt --profiles-dir dbt
+    restart: "no"
+    env_file:
+      - .env.dbt.local
+    environment:
+      - DBT_POSTGRES_HOST=postgres
+      - DBT_POSTGRES_PORT=5432
+
+  airflow-db-metadata:
+    image: postgres:${AIRFLOW_POSTGRES_VERSION:-14.7}
+    container_name: airflow-db-metadata
+    hostname: airflow-db-metadata
+    env_file:
+      - ./.env.airflow.local
+    environment:
+      - POSTGRES_USER=${AIRFLOW_POSTGRES_USER}
+      - POSTGRES_PASSWORD=${AIRFLOW_POSTGRES_PASSWORD}
+      - POSTGRES_DB=${AIRFLOW_POSTGRES_DB}
+      - POSTGRES_PORT=${AIRFLOW_POSTGRES_PORT}
+    volumes:
+      - airflow-db-metadata-volume:/var/lib/postgresql/data
+    ports:
+      - ${AIRFLOW_POSTGRES_PORT_HOST:-5441}:${AIRFLOW_POSTGRES_PORT:-5432}
+    restart: on-failure
+    healthcheck:
+      test: [ "CMD", "pg_isready", "-U", "${AIRFLOW_POSTGRES_USER:-airflow}" ]
+      interval: 5s
+      retries: 5
+
+  airflow-scheduler:
+    <<: [*airflow-common, *airflow-depends-on]
+    container_name: airflow-scheduler
+    command: scheduler
+    restart: on-failure
+    ports:
+      - 8793:8793
+
+  airflow-webserver:
+    <<: [*airflow-common, *airflow-depends-on]
+    container_name: airflow-webserver
+    restart: on-failure
+    command: webserver
+    ports:
+      - ${AIRFLOW_WEBSERVER_PORT_HOST:-8080}:8080
+    healthcheck:
+      test:
+        [
+          "CMD",
+          "curl",
+          "--fail",
+          "http://localhost:${AIRFLOW_WEBSERVER_PORT_HOST:-8080}/health"
+        ]
+      interval: 30s
+      timeout: 30s
+      retries: 5
+
+  airflow-init:
+    <<: *airflow-common
+    container_name: airflow-init
+    entrypoint: /bin/bash
+    user: 0:0
+    command:
+      - -c
+      - |
+        mkdir -p /sources/logs /sources/dags /sources/plugins
+        chown -R "${AIRFLOW_UID:-0}:0" /sources/{logs,dags,plugins}
+        exec /entrypoint airflow db init
+
+volumes:
+  airflow-db-metadata-volume:
+
+networks:
+  default:
+    name: analytics-engineer-assignment
