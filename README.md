@@ -43,12 +43,12 @@ This is the structure of the project.
 │   │   ├── generate_schema_name.sql
 │   │   └── macros.yml
 │   ├── models
-│   │   ├── core
-│   │   │   ├── core.yml
-│   │   │   ├── core_commits.sql
-│   │   │   ├── core_events.sql
-│   │   │   ├── core_repos.sql
-│   │   │   └── core_users.sql
+│   │   ├── intermediate
+│   │   │   ├── int_commits.sql
+│   │   │   ├── int_events.sql
+│   │   │   ├── int_repos.sql
+│   │   │   ├── int_users.sql
+│   │   │   └── intermediate.yml
 │   │   ├── landing.yml
 │   │   ├── marts
 │   │   │   ├── marts.yml
@@ -78,13 +78,20 @@ This is the structure of the project.
 │   │   └── .gitkeep
 │   └── tests
 │       └── .gitkeep
+├── dbt_packages
 ├── docker-compose.yml
+├── images
+│   ├── airflow_dag.png
+│   ├── lineage.png
+│   └── raw_erd.png
 ├── mypy.ini
 ├── noxfile.py
 ├── poetry.lock
 ├── pyproject.toml
 └── scripts
     └── postgres_init.sh
+
+18 directories, 63 files
 ```
 
 ## What you'll need
@@ -437,3 +444,9 @@ All the code in this project has been linted and formatted with these tools:
 - [mypy](https://mypy.readthedocs.io/en/stable/)
 - [ruff](https://docs.astral.sh/ruff/)
 - [sqlfluff](https://docs.astral.sh/sqlfluff/)
+
+Want to play around with the pre-commit framework? Just run:
+
+```bash
+make nox-hooks
+```
