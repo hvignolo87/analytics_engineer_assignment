@@ -1,0 +1,37 @@
+version: 2
+
+seeds:
+  - name: actors
+    config:
+      schema: raw
+      description: "A list of Github users and their related IDs"
+      column_types:
+        id: integer
+        username: character varying
+
+  - name: commits
+    config:
+      schema: raw
+      description: "Commit messages per event"
+      column_types:
+        sha: character varying
+        message: character varying
+        event_id: bigint
+
+  - name: events
+    config:
+      schema: raw
+      description: "Events that ocurred"
+      column_types:
+        id: bigint
+        type: character varying
+        actor_id: integer
+        repo_id: integer
+
+  - name: repos
+    config:
+      schema: raw
+      description: "A list of repositories and their related IDs"
+      column_types:
+        id: integer
+        name: character varying

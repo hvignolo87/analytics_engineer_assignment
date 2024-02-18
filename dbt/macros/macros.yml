@@ -1,0 +1,14 @@
+version: 2
+
+macros:
+  - name: generate_schema_name
+    description: "Dynamically generates a schema name, depending on the environment"
+    docs:
+      show: true
+    arguments:
+      - name: custom_schema_name
+        type: string
+        description: "The schema defined in the profiles.yml, for the selected target"
+      - name: node
+        type: string
+        description: "Not used, but required to override the dbt macro"

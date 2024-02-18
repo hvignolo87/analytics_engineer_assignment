@@ -1,0 +1,27 @@
+config:
+  partial_parse: true
+  version_check: false
+  send_anonymous_usage_stats: false
+  debug: false
+
+clara:
+  target: dev
+  outputs:
+    dev:
+      dbname: "{{ env_var('DBT_POSTGRES_DB') }}"
+      host: "{{ env_var('DBT_POSTGRES_HOST') }}"
+      port: "{{ env_var('DBT_POSTGRES_PORT') | int }}"
+      user: "{{ env_var('DBT_POSTGRES_USER') }}"
+      pass: "{{ env_var('DBT_POSTGRES_PASSWORD') }}"
+      schema: "{{ env_var('DBT_POSTGRES_SCHEMA') }}"
+      type: postgres
+      threads: 4
+    prod:
+      dbname: "{{ env_var('DBT_POSTGRES_DB') }}"
+      host: "{{ env_var('DBT_POSTGRES_HOST') }}"
+      port: "{{ env_var('DBT_POSTGRES_PORT') | int }}"
+      user: "{{ env_var('DBT_POSTGRES_USER') }}"
+      pass: "{{ env_var('DBT_POSTGRES_PASSWORD') }}"
+      schema: prod
+      type: postgres
+      threads: 4

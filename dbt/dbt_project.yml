@@ -1,0 +1,53 @@
+name: "clara"
+version: "1.0.0"
+config-version: 2
+
+profile: "clara"
+
+model-paths: ["models"]
+analysis-paths: ["analyses"]
+test-paths: ["tests"]
+seed-paths: ["seeds"]
+macro-paths: ["macros"]
+snapshot-paths: ["snapshots"]
+target-path: "target"
+
+clean-targets:
+  - "target"
+  - "dbt_packages"
+  - "logs"
+
+quoting:
+  database: true
+  schema: true
+  identifier: true
+
+models:
+  clara:
+    core:
+      +materialized: table
+      +schema: core
+      +tags: core
+    marts:
+      +materialized: table
+      +tags: marts
+      reporting:
+        +schema: reporting
+        +tags:
+          - reporting
+          - reports
+    staging:
+      +materialized: table
+      +schema: staging
+      +tags:
+        - staging
+        - stg
+
+seeds:
+  clara:
+    +schema: raw
+    +docs:
+      show: false
+    +tags:
+      - seeds
+      - seed

@@ -1,0 +1,55 @@
+version: 2
+
+sources:
+  - name: raw
+    description: "Raw data related to the assignment"
+    schema: raw
+    tables:
+      - name: actors
+        description: "A list of Github users and their related IDs"
+        columns:
+          - name: id
+            data_type: integer
+            description: "The user ID"
+          - name: username
+            data_type: character varying
+            description: "The name of the user"
+
+      - name: commits
+        description: "Commit messages per event"
+        columns:
+          - name: sha
+            data_type: character varying
+            description: "The commit SHA"
+          - name: message
+            data_type: character varying
+            description: "The commit message"
+          - name: event_id
+            data_type: bigint
+            description: "The ID of the event type in the events table"
+
+      - name: events
+        description: "Events that ocurred"
+        columns:
+          - name: id
+            data_type: bigint
+            description: "The event ID"
+          - name: type
+            data_type: character varying
+            description: "The event type"
+          - name: actor_id
+            data_type: integer
+            description: "The related ID of the actors table"
+          - name: repo_id
+            data_type: integer
+            description: "The related ID of the repos table"
+
+      - name: repos
+        description: "A list of repositories and their related IDs"
+        columns:
+          - name: id
+            data_type: integer
+            description: "The repo ID"
+          - name: name
+            data_type: character varying
+            description: "The repo name"
