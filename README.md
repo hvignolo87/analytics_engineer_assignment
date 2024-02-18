@@ -295,12 +295,23 @@ So at first sight, the `dim_users` can be an [SCD type 2](https://en.wikipedia.o
 Performing a similar thing for the rest of the questions:
 
 > Top 10 repositories sorted by the amount of commits pushed
+>
 > Top 10 repositories sorted by the amount of watch events
 
 I realized that the queries would be quite similar to the previous one, and the other dimensions were very straightforward. So, these tables were created too:
 
 - `dim_commits` is a dimension table, containing the commit ID, the commit SHA, and the event ID
 - `dim_repos` is a dimension table, containing the repo ID and name
+
+#### 4. Create the models
+
+I decided to use [classic modular data modeling techniques](https://www.getdbt.com/analytics-engineering/modular-data-modeling-technique#what-is-modular-data-modeling), and thought about these layers:
+
+- `staging`: just a copy of the landing/source tables with some types casting (if needed), in order to standardize
+- `intermediate`: here I'll place reusable models, with some deduplication logic
+- `marts`: here I'll place the final models, in a star schema (facts surrounded by dimensions)
+
+Since the raw data doesn't need much processing (just some deduplication logic), all of the models in the staging and intermediate layers will be quite similar, and the only difference will be the deduplication logic. I've created a macro to apply the DRY principle in these layers.
 
 ### SQL queries for reporting
 
