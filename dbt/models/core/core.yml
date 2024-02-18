@@ -1,1 +1,51 @@
 version: 2
+
+models:
+  - name: core_users
+    description: ""
+    columns:
+      - name: id
+        data_type: integer
+        description: ""
+      - name: username
+        data_type: character varying
+        description: ""
+
+  - name: core_commits
+    description: ""
+    columns:
+      - name: sha
+        data_type: character varying
+        description: ""
+      - name: message
+        data_type: character varying
+        description: ""
+      - name: event_id
+        data_type: bigint
+        description: ""
+
+  - name: core_events
+    description: ""
+    columns:
+      - name: id
+        data_type: bigint
+        description: ""
+      - name: type
+        data_type: character varying
+        description: ""
+      - name: user_id
+        data_type: integer
+        description: ""
+      - name: repo_id
+        data_type: integer
+        description: ""
+
+  - name: core_repos
+    description: ""
+    columns:
+      - name: id
+        data_type: integer
+        description: ""
+      - name: name
+        data_type: character varying
+        description: ""

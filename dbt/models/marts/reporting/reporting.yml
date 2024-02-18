@@ -1,0 +1,93 @@
+version: 2
+
+models:
+  - name: dim_users
+    description: ""
+    config:
+      contract:
+        enforced: true
+    constraints:
+      - type: primary_key
+        columns: [id]
+    columns:
+      - name: id
+        data_type: integer
+        description: ""
+        constraints:
+          - type: unique
+          - type: not_null
+      - name: username
+        data_type: character varying
+        description: ""
+
+  - name: dim_commits
+    description: ""
+    config:
+      contract:
+        enforced: true
+    constraints:
+      - type: primary_key
+        columns: [event_id, sha]
+    columns:
+      - name: sha
+        data_type: character varying
+        description: ""
+      - name: message
+        data_type: character varying
+        description: ""
+      - name: event_id
+        data_type: bigint
+        description: ""
+
+  - name: fct_events
+    description: ""
+    config:
+      contract:
+        enforced: true
+    columns:
+      - name: event_id
+        data_type: bigint
+        description: ""
+        constraints:
+          - type: not_null
+      - name: event_type
+        data_type: character varying
+        description: ""
+        constraints:
+          - type: not_null
+      - name: repo_id
+        data_type: integer
+        description: ""
+        constraints:
+          - type: not_null
+          - type: foreign_key
+            expression: reporting.dim_repos(id)
+      - name: commit_sha
+        data_type: character varying
+        description: ""
+      - name: user_id
+        data_type: integer
+        description: ""
+        constraints:
+          - type: not_null
+          - type: foreign_key
+            expression: reporting.dim_users(id)
+
+  - name: dim_repos
+    description: ""
+    config:
+      contract:
+        enforced: true
+    constraints:
+      - type: primary_key
+        columns: [id]
+    columns:
+      - name: id
+        data_type: integer
+        description: ""
+        constraints:
+          - type: unique
+          - type: not_null
+      - name: name
+        data_type: character varying
+        description: ""

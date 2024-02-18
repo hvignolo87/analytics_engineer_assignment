@@ -1,7 +1,8 @@
 {{
     generate_raw_data(
         relation=ref('stg_repos'),
-        deduplicate=True
+        deduplicate=True,
+        partition_by=['id']
     )
 }}
 

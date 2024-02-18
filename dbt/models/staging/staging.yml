@@ -1,1 +1,51 @@
 version: 2
+
+models:
+  - name: stg_actors
+    description: ""
+    columns:
+      - name: id
+        data_type: integer
+        description: ""
+      - name: username
+        data_type: character varying
+        description: ""
+
+  - name: stg_commits
+    description: ""
+    columns:
+      - name: sha
+        data_type: character varying
+        description: ""
+      - name: message
+        data_type: character varying
+        description: ""
+      - name: event_id
+        data_type: bigint
+        description: ""
+
+  - name: stg_events
+    description: ""
+    columns:
+      - name: id
+        data_type: bigint
+        description: ""
+      - name: type
+        data_type: character varying
+        description: ""
+      - name: actor_id
+        data_type: integer
+        description: ""
+      - name: repo_id
+        data_type: integer
+        description: ""
+
+  - name: stg_repos
+    description: ""
+    columns:
+      - name: id
+        data_type: integer
+        description: ""
+      - name: name
+        data_type: character varying
+        description: ""

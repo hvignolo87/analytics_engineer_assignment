@@ -1,3 +1,13 @@
+{{
+    config(
+        indexes=[
+            {'columns': ['event_type', 'user_id']},
+            {'columns': ['repo_id', 'commit_sha']},
+            {'columns': ['repo_id', 'event_type']}
+        ]
+    )
+}}
+
 SELECT
     events.id AS event_id
     , events.type AS event_type

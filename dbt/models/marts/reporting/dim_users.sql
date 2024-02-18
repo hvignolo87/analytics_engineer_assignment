@@ -1,3 +1,11 @@
+{{
+    config(
+        indexes=[
+            {'columns': ['id', 'username']}
+        ]
+    )
+}}
+
 SELECT
     id
     , username
