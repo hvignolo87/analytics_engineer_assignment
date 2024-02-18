@@ -1,0 +1,12 @@
+*.venv*
+*.mypy_cache*
+*__pycache__*
+*.DS_Store
+*.ruff_cache*
+*.nox*
+.env.*
+!.env.*.example
+
+dbt/target/
+dbt/dbt_packages/
+dbt/logs/
