@@ -1,8 +1,6 @@
 # Analytics Engineer assignment resolution
 
-[![Apache Airflow](https://img.shields.io/badge/Apache%20Airflow-2.6.3-green.svg?logo=apacheairflow)](https://airflow.apache.org/docs/apache-airflow/2.6.3/index.html) [![Python 3.10.12](https://img.shields.io/badge/python-3.10.12-blue.svg?labelColor=%23FFE873&logo=python)](https://www.python.org/downloads/release/python-31012/) ![dbt-version](https://img.shields.io/badge/dbt-version?style=flat&logo=dbt&label=1.5&link=https%3A%2F%2Fdocs.getdbt.com%2Fdocs%2Fintroduction)<br>
-[![Ruff](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/astral-sh/ruff/main/assets/badge/v2.json)](https://docs.astral.sh/ruff/) [![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://black.readthedocs.io/en/stable/) [![Imports: isort](https://img.shields.io/badge/%20imports-isort-%231674b1?style=flat&labelColor=ef8336)](https://pycqa.github.io/isort/)<br>
-[![Conventional Commits](https://img.shields.io/badge/Conventional%20Commits-1.0.0-%23FE5196?logo=conventionalcommits&logoColor=white)](https://conventionalcommits.org) [![pre-commit](https://img.shields.io/badge/pre--commit-enabled-brightgreen?logo=pre-commit)](https://pre-commit.com/)
+[![Apache Airflow](https://img.shields.io/badge/Apache%20Airflow-2.6.3-green.svg?logo=apacheairflow)](https://airflow.apache.org/docs/apache-airflow/2.6.3/index.html) [![Python 3.10.12](https://img.shields.io/badge/python-3.10.12-blue.svg?labelColor=%23FFE873&logo=python)](https://www.python.org/downloads/release/python-31012/) ![dbt-version](https://img.shields.io/badge/dbt-version?style=flat&logo=dbt&label=1.5&link=https%3A%2F%2Fdocs.getdbt.com%2Fdocs%2Fintroduction)<br>[![Ruff](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/astral-sh/ruff/main/assets/badge/v2.json)](https://docs.astral.sh/ruff/) [![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://black.readthedocs.io/en/stable/) [![Imports: isort](https://img.shields.io/badge/%20imports-isort-%231674b1?style=flat&labelColor=ef8336)](https://pycqa.github.io/isort/)<br>[![Conventional Commits](https://img.shields.io/badge/Conventional%20Commits-1.0.0-%23FE5196?logo=conventionalcommits&logoColor=white)](https://conventionalcommits.org) [![pre-commit](https://img.shields.io/badge/pre--commit-enabled-brightgreen?logo=pre-commit)](https://pre-commit.com/)
 
 In this document, you'll find information and instructions about my solution to the analytics engineer assignment.
 
@@ -180,7 +178,131 @@ make dbt-run-model node="--target prod"
 
 And wait until all the models are finished.
 
-## Assignment resolution: SQL queries for reporting
+## Assignment resolution
+
+### How I've created the data model
+
+#### 1. Understanding the raw data
+
+First of all, I've manually inspected the provided raw data by digging into it. Then, I took a look at [the GitHub Events API docs](https://docs.github.com/en/rest/using-the-rest-api/github-event-types?apiVersion=2022-11-28).
+
+Once I had that in mind, I understood the relations between the provided data. Here's an ERD:
+
+<img src="./images/raw_erd.png" alt="raw_erd" width="500" height="250" style="vertical-align:middle"><br>
+
+The relationship highlights are:
+
+- One actor/user can have multiple events (e.g., `event_type = 'PushEvent'` and different commit SHAs)
+- One repository can have multiple events
+- One commit represents one single transaction
+
+#### 2. Analyzing deeply the raw data
+
+Taking a closer look into the raw data, I realized that there were some duplicates in the `repos` and `users` tables, and I've found (mainly) 2 strange things in those tables.
+
+First, there are 2 different usernames with the same id (`59176384`):
+
+```sql
+SELECT
+    id
+    , COUNT(DISTINCT username) AS num_of_users_per_id
+FROM raw.actors
+GROUP BY 1
+ORDER BY 2 DESC
+LIMIT 5
+```
+
+The usernames are:
+
+| id | username |
+|---|---|
+| 59176384 | starnetwifi |
+| 59176384 | starwifi88 |
+
+So I decided to use `DISTINCT ON` in the pipeline as deduplication logic, so the first row remains.
+
+Second, there are 14 repositories ID repeated with different names:
+
+```sql
+SELECT
+    id
+    , COUNT(DISTINCT name) AS num_of_names_per_id
+FROM raw.repos
+GROUP BY 1
+ORDER BY 2 DESC
+LIMIT 15
+```
+
+For example, the ID `230999134` has the following names:
+
+| id | name |
+|---|---|
+| 230999134 | hseera/dynamodb-billing-mode |
+| 230999134 | hseera/dynamodb-update-capacity |
+| 230999134 | hseera/update-dynamodb-capacity |
+
+So I took the same logic into account in the pipeline.
+
+These decisions were taken because no further explanations were provided.
+
+Another thing that is worth mentioning is that the `PullRequestEvent` event doesn't have [the payload data](https://docs.github.com/en/rest/using-the-rest-api/github-event-types?apiVersion=2022-11-28#event-payload-object-for-pullrequestevent), so it's impossible to distinguish the events between opened, edited, closed, etc. I've assumed that the `PullRequestEvent` corresponds to the PR `opened` event.
+
+This is because of the nature of the first question:
+
+> Top 10 active users sorted by the amount of PRs created and commits pushed
+
+The real question that I'll be answering is:
+
+> Top 10 active users sorted by the amount of PRs events and commits pushed
+
+Please take into account that, as per the question, the commits do not necessarily have to be related to the same PR.
+
+Finally, I understood that the phrase `active users` refers not to a bot.
+
+#### 3. Create draft queries to answer the questions
+
+I thought:
+
+> I have the questions that I need to answer, so... how does a SQL query that answer them might look like?
+
+Let's think about the first one:
+
+> Top 10 active users sorted by the amount of PRs created and commits pushed
+
+It will look somehow like these:
+
+```sql
+SELECT
+    dim_users.user_id
+    , dim_users.username
+    , COUNT(*) AS num_prs_created_and_commits_pushed
+FROM some_schema.fct_events
+LEFT JOIN some_schema.dim_users
+    ON fct_events.user_id = dim_users.id
+WHERE fct_events.event_type IN ('PushEvent', 'PullRequestEvent')
+GROUP BY 1, 2
+ORDER BY 3 DESC
+LIMIT 10
+```
+
+Where:
+
+- `dim_users` is a dimension table, containing the user ID and username
+- `fct_events` is the fact table, containing all the events
+
+So at first sight, the `dim_users` can be an [SCD type 2](https://en.wikipedia.org/wiki/Slowly_changing_dimension), as the username rarely changes over time, but it can. It seemed an overkill for this specific case, so I decided to model it as a type 0.
+
+Performing a similar thing for the rest of the questions:
+
+> Top 10 repositories sorted by the amount of commits pushed
+> Top 10 repositories sorted by the amount of watch events
+
+I realized that the queries would be quite similar to the previous one, and the other dimensions were very straightforward. So, these tables were created too:
+
+- `dim_commits` is a dimension table, containing the commit ID, the commit SHA, and the event ID
+- `dim_repos` is a dimension table, containing the repo ID and name
+
+### SQL queries for reporting
 
 Using the data model created with `dbt`, you can answer the required questions.
 
@@ -191,7 +313,7 @@ Please, run these queries in DBeaver to verify the results.
 SELECT
     fct_events.user_id AS user_id
     , dim_users.username AS username
-    , COUNT(*) AS num_commits_and_prs_events
+    , COUNT(*) AS num_prs_created_and_commits_pushed
 FROM reporting.fct_events
 LEFT JOIN reporting.dim_users
     ON fct_events.user_id = dim_users.id
@@ -231,5 +353,3 @@ GROUP BY 1, 2
 ORDER BY 3 DESC
 LIMIT 10
 ```
-
-<https://docs.github.com/en/rest/using-the-rest-api/github-event-types?apiVersion=2022-11-28>
