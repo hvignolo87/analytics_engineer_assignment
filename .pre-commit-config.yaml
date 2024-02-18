@@ -1,0 +1,100 @@
+repos:
+  - repo: local
+    hooks:
+      - id: debug-statements
+        name: 🐛 debug
+        entry: poetry run debug-statement-hook
+        language: system
+        types: [python]
+        stages: [commit, manual]
+
+      - id: trailing-whitespace
+        name: ✂️  trailing-whitespace
+        entry: poetry run trailing-whitespace-fixer
+        language: system
+        types_or: [dotenv, gitignore, makefile, markdown, plain-text, python, sh, sql, terraform, text, toml, yaml]
+        stages: [commit, manual]
+
+      - id: end-of-file-fixer
+        name: ⛔️ end-of-file-fixer
+        entry: poetry run end-of-file-fixer
+        language: system
+        types_or: [dotenv, gitignore, makefile, markdown, plain-text, python, sh, sql, terraform, text, toml, yaml]
+        stages: [commit, manual]
+
+      - id: black
+        name: ♟️  black
+        entry: poetry run black
+        language: system
+        types: [python]
+        stages: [commit, manual]
+
+      - id: mypy
+        name: 🆎 mypy
+        entry: poetry run mypy
+        args: [--config-file, mypy.ini]
+        language: system
+        types: [python]
+        exclude: ^tests/
+        stages: [commit, manual]
+
+      - id: ruff
+        name: 🌟 ruff
+        entry: poetry run ruff check
+        language: system
+        types: [python]
+        stages: [commit, manual]
+
+      - id: interrogate
+        name: 🔎 interrogate
+        entry: poetry run interrogate
+        args: [--omit-covered-files, dags]
+        language: system
+        types: [python]
+        exclude: |
+          (?x)(
+              ^tests/
+          )
+        stages: [commit, manual]
+
+      - id: sqlfluff-fix-dags
+        name: 🔧 sqlfluff-fix-dags
+        entry: poetry run sqlfluff fix
+        files: ^dags/
+        exclude: ^dags/sql/incremental_load/
+        args: [--force, --config, ./dags/.sqlfluff]
+        language: system
+        description: 'Fixes SQL lint errors with `SQLFluff` in the DAGs directory'
+        types: [sql]
+        stages: [manual]
+
+      - id: sqlfluff-lint-dags
+        name: 🚀 sqlfluff-lint-dags
+        entry: poetry run sqlfluff lint
+        files: ^dags/
+        exclude: ^dags/sql/incremental_load/
+        args: [--config, ./dags/.sqlfluff]
+        language: system
+        description: 'Lints SQL files with `SQLFluff` in the DAGs directory'
+        types: [sql]
+        stages: [manual]
+
+      - id: sqlfluff-fix-dbt
+        name: 🔧 sqlfluff-fix-dbt
+        entry: poetry run sqlfluff fix
+        files: ^dbt/
+        args: [--force, --config, ./.sqlfluff]
+        language: system
+        description: 'Fixes SQL lint errors with `SQLFluff` in the dbt directory'
+        types: [sql]
+        stages: [commit, manual]
+
+      - id: sqlfluff-lint-dbt
+        name: 🚀 sqlfluff-lint-dbt
+        entry: poetry run sqlfluff lint
+        files: ^dbt/
+        args: [--config, ./.sqlfluff]
+        language: system
+        description: 'Lints SQL files with `SQLFluff` in the dbt directory'
+        types: [sql]
+        stages: [commit, manual]
