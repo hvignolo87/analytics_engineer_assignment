@@ -10,6 +10,9 @@ x-airflow-common:
   env_file:
     - ./.env.airflow.local
     - ./.env.dbt.local
+  environment:
+    - DBT_POSTGRES_HOST=postgres
+    - DBT_POSTGRES_PORT=5432
   volumes:
     - ./dags:/opt/airflow/dags
     - ./dbt:/opt/airflow/dbt:rw
