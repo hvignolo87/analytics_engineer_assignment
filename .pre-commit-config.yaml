@@ -48,13 +48,8 @@ repos:
       - id: interrogate
         name: 🔎 interrogate
         entry: poetry run interrogate
-        args: [--omit-covered-files, dags]
         language: system
         types: [python]
-        exclude: |
-          (?x)(
-              ^tests/
-          )
         stages: [commit, manual]
 
       - id: sqlfluff-fix-dags
