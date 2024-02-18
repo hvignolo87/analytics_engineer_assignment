@@ -383,4 +383,57 @@ Generally speaking, the tests aim to ensure:
 - There are no duplicates
 - Critical columns are present
 
+To run the tests, open a terminal and run:
+
+```bash
+make dbt-test-model node="--target prod"
+```
+
 Also, there are some model contracts enforced in the `reporting` layer, in order to avoid inserting duplicated fields, nulls, etc., and to ensure the models' relations.
+
+## Running the dbt workflow in an Airflow DAG
+
+If you're an Airflow fan (like me), you can set up an environment to run the dbt pipeline in an Airflow DAG.
+
+To do this, please run (these commands are similar to the setup process):
+
+```bash
+make build
+make up
+```
+
+Then, go to [http://localhost:8080/](http://localhost:8080/) and log in with the credentials `airflow:airflow`. You'll find a DAG named `transformations`, please go ahead and click on it. You'll see a DAG like this:
+
+![airflow_dag](./images/airflow_dag.png)
+
+If you want to test it, just click on the toggle button and run the pipeline.
+
+Please note that the models are run before their tests in the same DAG.
+
+## More commands and help
+
+If you're struggling with some commands, please run `make help` to get all the available commands.
+
+## About the development tools
+
+I've used [poetry](https://python-poetry.org/) to manage the project's dependencies. If you want to install it in your local machine, please run:
+
+```bash
+make install-poetry
+```
+
+And then run:
+
+```bash
+make install-project
+```
+
+Then you'll have all the dependencies installed, and a virtual environment created in this very directory. This is useful, for example, if you're using VS Code and want to explore the code. Also, you might want to use [pyenv](https://github.com/pyenv/pyenv) to install Python 3.10.12.
+
+All the code in this project has been linted and formatted with these tools:
+
+- [black](https://black.readthedocs.io/en/stable/)
+- [isort](https://pycqa.github.io/isort/)
+- [mypy](https://mypy.readthedocs.io/en/stable/)
+- [ruff](https://docs.astral.sh/ruff/)
+- [sqlfluff](https://docs.astral.sh/sqlfluff/)
