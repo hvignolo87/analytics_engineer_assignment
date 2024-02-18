@@ -44,15 +44,26 @@ models:
     config:
       contract:
         enforced: true
+    tests:
+      - dbt_expectations.expect_table_columns_to_contain_set:
+          column_list:
+            [
+              "id",
+              "repo_id",
+              "user_id",
+            ]
+      - dbt_expectations.expect_compound_columns_to_be_unique:
+          column_list: ["id", "type", "repo_id", "commit_sha", "user_id"]
     columns:
-      - name: event_id
+      - name: id
         data_type: bigint
         description: ""
         constraints:
           - type: not_null
-      - name: event_type
+      - name: type
         data_type: character varying
         description: ""
+        quote: true
         constraints:
           - type: not_null
       - name: repo_id

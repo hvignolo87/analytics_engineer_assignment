@@ -7,9 +7,20 @@ models:
       - name: id
         data_type: integer
         description: ""
+        tests:
+          - not_null
+          - unique
+          - dbt_expectations.expect_column_values_to_be_of_type:
+              column_type: integer
       - name: username
         data_type: character varying
         description: ""
+        tests:
+          - not_null:
+              config:
+                severity: error
+                error_if: ">1000"
+                warn_if: ">100"
 
   - name: int_commits
     description: ""
@@ -23,6 +34,11 @@ models:
       - name: event_id
         data_type: bigint
         description: ""
+        tests:
+          - not_null
+          - unique
+          - dbt_expectations.expect_column_values_to_be_of_type:
+              column_type: bigint
 
   - name: int_events
     description: ""
@@ -30,15 +46,28 @@ models:
       - name: id
         data_type: bigint
         description: ""
+        tests:
+          - not_null
+          - unique
+          - dbt_expectations.expect_column_values_to_be_of_type:
+              column_type: bigint
       - name: type
         data_type: character varying
         description: ""
       - name: user_id
         data_type: integer
         description: ""
+        tests:
+          - not_null
+          - dbt_expectations.expect_column_values_to_be_of_type:
+              column_type: integer
       - name: repo_id
         data_type: integer
         description: ""
+        tests:
+          - not_null
+          - dbt_expectations.expect_column_values_to_be_of_type:
+              column_type: integer
 
   - name: int_repos
     description: ""
@@ -46,6 +75,11 @@ models:
       - name: id
         data_type: integer
         description: ""
+        tests:
+          - not_null
+          - unique
+          - dbt_expectations.expect_column_values_to_be_of_type:
+              column_type: integer
       - name: name
         data_type: character varying
         description: ""
