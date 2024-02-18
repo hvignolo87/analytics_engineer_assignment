@@ -236,7 +236,7 @@ dbt-docs-serve: ## Serve the documentation website for the dbt project. Usage: m
 .PHONY: dbt-gen-source-yaml
 dbt-gen-source-yaml: ## Generate lightweight YAML for sources. Usage: make dbt-gen-source-yaml db="clara" schema="raw"
 	$(call log, Generating sources for $(db).$(schema)...)
-	poetry run dbt run-operation generate_source --project-dir dbt --profiles-dir dbt --args \
+	poetry run dbt run-operation generate_source --target prod --project-dir dbt --profiles-dir dbt --args \
 		'{ \
 			"database_name": "$(db)", \
 			"schema_name": "$(schema)", \
@@ -249,7 +249,7 @@ dbt-gen-source-yaml: ## Generate lightweight YAML for sources. Usage: make dbt-g
 .PHONY: dbt-gen-model-yaml
 dbt-gen-model-yaml: ## Generate YAML for models. Usage: make dbt-gen-model-yaml model='["stg_events", "core_events"]'
 	$(call log, Generating models for $(model)...)
-	poetry run dbt run-operation generate_model_yaml --project-dir dbt --profiles-dir dbt --args \
+	poetry run dbt run-operation generate_model_yaml --target prod --project-dir dbt --profiles-dir dbt --args \
 		'{ \
 			"model_names": $(model), \
 			"upstream_descriptions": true, \
