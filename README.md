@@ -116,6 +116,7 @@ Run these commands in this sequence:
 ```bash
 make install-poetry
 make install-project
+make dbt-install-pkgs
 ```
 
 Optionally, if you've cloned the repo, you can run:
@@ -265,6 +266,8 @@ I thought:
 
 > I have the questions that I need to answer, so... how does a SQL query that answer them might look like?
 
+_I'm assuming that the data consumers are familiar with SQL. If this is not the case, the solution might be to create a specific report schema and tables with the results of the following queries._
+
 Let's think about the first one:
 
 > Top 10 active users sorted by the amount of PRs created and commits pushed
@@ -279,7 +282,7 @@ SELECT
 FROM some_schema.fct_events
 LEFT JOIN some_schema.dim_users
     ON fct_events.user_id = dim_users.id
-WHERE fct_events.event_type IN ('PushEvent', 'PullRequestEvent')
+WHERE fct_events."type" IN ('PushEvent', 'PullRequestEvent')
 GROUP BY 1, 2
 ORDER BY 3 DESC
 LIMIT 10
@@ -313,6 +316,10 @@ I decided to use [classic modular data modeling techniques](https://www.getdbt.c
 
 Since the raw data doesn't need much processing (just some deduplication logic), all of the models in the staging and intermediate layers will be quite similar, and the only difference will be the deduplication logic. I've created a macro to apply the DRY principle in these layers.
 
+The final lineage graph is as follows:
+
+![lineage_graph](./images/lineage.png)
+
 ### SQL queries for reporting
 
 Using the data model created with `dbt`, you can answer the required questions.
@@ -328,7 +335,7 @@ SELECT
 FROM reporting.fct_events
 LEFT JOIN reporting.dim_users
     ON fct_events.user_id = dim_users.id
-WHERE fct_events.event_type IN ('PushEvent', 'PullRequestEvent')
+WHERE fct_events."type" IN ('PushEvent', 'PullRequestEvent')
     AND NOT username ~* '-bot|\[bot\]|bot$'
 GROUP BY 1, 2
 ORDER BY 3 DESC
@@ -359,8 +366,21 @@ SELECT
 FROM reporting.fct_events
 LEFT JOIN reporting.dim_repos
     ON fct_events.repo_id = dim_repos.id
-WHERE fct_events.event_type = 'WatchEvent'
+WHERE fct_events."type" = 'WatchEvent'
 GROUP BY 1, 2
 ORDER BY 3 DESC
 LIMIT 10
 ```
+
+### Model contracts and tests
+
+I've added some tests in the `intermediate` and `reporting` layers to verify the correctness of the data and ensure the data quality.
+
+Generally speaking, the tests aim to ensure:
+
+- No ID is missing
+- Data types are as expected
+- There are no duplicates
+- The minimum columns are present
+
+Also, there are some model contracts enforced in the `reporting` layer, in order to avoid inserting duplicated fields, nulls, etc., and to ensure the models' relations.
