@@ -381,6 +381,6 @@ Generally speaking, the tests aim to ensure:
 - No ID is missing
 - Data types are as expected
 - There are no duplicates
-- The minimum columns are present
+- Critical columns are present
 
 Also, there are some model contracts enforced in the `reporting` layer, in order to avoid inserting duplicated fields, nulls, etc., and to ensure the models' relations.
