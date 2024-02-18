@@ -72,7 +72,7 @@ models:
         constraints:
           - type: not_null
           - type: foreign_key
-            expression: reporting.dim_repos(id)
+            expression: intermediate.int_repos(id)
       - name: commit_sha
         data_type: character varying
         description: ""
@@ -82,7 +82,7 @@ models:
         constraints:
           - type: not_null
           - type: foreign_key
-            expression: reporting.dim_users(id)
+            expression: intermediate.int_users(id)
 
   - name: dim_repos
     description: ""
@@ -102,3 +102,4 @@ models:
       - name: name
         data_type: character varying
         description: ""
+        quote: true

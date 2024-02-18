@@ -3,10 +3,16 @@ version: 2
 models:
   - name: int_users
     description: ""
+    config:
+      contract:
+        enforced: true
     columns:
       - name: id
         data_type: integer
         description: ""
+        constraints:
+          - type: unique
+          - type: not_null
         tests:
           - not_null
           - unique
@@ -70,10 +76,16 @@ models:
 
   - name: int_repos
     description: ""
+    config:
+      contract:
+        enforced: true
     columns:
       - name: id
         data_type: integer
         description: ""
+        constraints:
+          - type: unique
+          - type: not_null
         tests:
           - not_null
           - unique
