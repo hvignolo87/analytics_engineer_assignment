@@ -37,6 +37,7 @@ services:
     restart: unless-stopped
     volumes:
       - ./scripts/postgres_init.sh:/docker-entrypoint-initdb.d/postgres_init.sh
+      - postgres-volume:/var/lib/postgresql/data
     healthcheck:
       test:
         [
