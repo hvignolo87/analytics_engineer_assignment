@@ -12,3 +12,24 @@ macros:
       - name: node
         type: string
         description: "Not used, but required to override the dbt macro"
+
+  - name: generate_raw_data
+    description: "Creates the SQL statements to load the raw data, and deduplicate it, if needed"
+    docs:
+      show: true
+    arguments:
+      - name: relation
+        type: relation
+        description: "The relation that contains the data you're querying"
+      - name: columns
+        type: list or *
+        description: "List of columns to load or '*' to load all"
+      - name: deduplicate
+        type: boolean
+        description: "Whether to deduplicate the data or not, default is false"
+      - name: partition_by
+        type: list or None
+        description: "List of columns to partition by, if any. Default is None, so all columns will be used"
+      - name: order_by
+        type: list or None
+        description: "List of columns to order by, if any. Default is None, so all columns will be used"
