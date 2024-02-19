@@ -78,7 +78,6 @@ This is the structure of the project.
 │   │   └── .gitkeep
 │   └── tests
 │       └── .gitkeep
-├── dbt_packages
 ├── docker-compose.yml
 ├── images
 │   ├── airflow_dag.png
@@ -91,7 +90,7 @@ This is the structure of the project.
 └── scripts
     └── postgres_init.sh
 
-18 directories, 63 files
+17 directories, 63 files
 ```
 
 ## What you'll need
