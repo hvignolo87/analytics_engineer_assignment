@@ -135,6 +135,7 @@ services:
 
 volumes:
   airflow-db-metadata-volume:
+  postgres-volume:
 
 networks:
   default:
