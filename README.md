@@ -166,13 +166,13 @@ Open DBeaver, and set up the connection to the database. If you didn't modify th
 
 Then, please open the `queries.sql` and `view.sql` files and run queries in DBeaver to verify the results.
 
-If you don't have DBeaver, you can run the queries from PostgreSQL's terminal with [psql](https://www.postgresql.org/docs/14/app-psql.html). To do this, please run:
+If you don't have DBeaver, you can run your queries from PostgreSQL's terminal with [psql](https://www.postgresql.org/docs/14/app-psql.html). To do this, please run:
 
 ```bash
 make execute-sql
 ```
 
-Then you can run the queries from the terminal.
+Then you can run them from the terminal.
 
 ## Creating the data model
 
@@ -396,7 +396,7 @@ To run the tests, open a terminal and run:
 make dbt-test-model node="--target prod"
 ```
 
-Also, there are some model contracts enforced in the `reporting` layer, in order to avoid inserting duplicated fields, nulls, etc., and to ensure the models' relations.
+Also, there are some model contracts enforced in the `intermediate` and `reporting` layers, in order to avoid inserting duplicated fields, nulls, etc., and to ensure the models' relations.
 
 ## Running the dbt workflow in an Airflow DAG
 
