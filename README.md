@@ -445,7 +445,7 @@ All the code in this project has been linted and formatted with these tools:
 - [ruff](https://docs.astral.sh/ruff/)
 - [sqlfluff](https://docs.astral.sh/sqlfluff/)
 
-Want to play around with the pre-commit framework? Just run:
+I just cloned the repo and want to play around with the pre-commit framework? Just run:
 
 ```bash
 make nox-hooks
